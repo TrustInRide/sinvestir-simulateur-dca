@@ -1,0 +1,53 @@
+/* ------------------------------------------------------------------ */
+/*  Domain types — shared across API layer, calculations and UI.       */
+/* ------------------------------------------------------------------ */
+
+/** A coin as returned by CoinGecko's `/search` endpoint (trimmed). */
+export interface CoinSearchResult {
+  id: string;
+  symbol: string;
+  name: string;
+  thumb: string;
+}
+
+/** A single market price observation. `timestamp` is epoch **milliseconds**. */
+export interface PricePoint {
+  timestamp: number;
+  price: number;
+}
+
+/** Investment cadence for the DCA simulation. */
+export type Frequency = "one-shot" | "daily" | "weekly" | "monthly";
+
+/** User-supplied parameters driving a simulation. */
+export interface DCAParams {
+  coinId: string;
+  coinName: string;
+  /** Ticker (e.g. `BTC`) — used to resolve the Coinbase EUR pair. */
+  coinSymbol: string;
+  amount: number;
+  frequency: Frequency;
+  startDate: Date;
+  endDate: Date;
+}
+
+/** One point on the portfolio value curve (one per calendar day in range). */
+export interface PortfolioPoint {
+  date: Date;
+  /** Portfolio market value on that day: `units × price`. */
+  value: number;
+  /** Cumulative amount invested up to and including that day. */
+  invested: number;
+  /** Cumulative coin units held up to and including that day. */
+  units: number;
+}
+
+/** Outcome of a DCA simulation. */
+export interface DCAResult {
+  totalInvested: number;
+  finalValue: number;
+  gainLoss: number;
+  gainLossPercent: number;
+  totalUnits: number;
+  portfolioHistory: PortfolioPoint[];
+}

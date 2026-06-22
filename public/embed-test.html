@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Test embed — Simulateur DCA Crypto</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #f4f4f5; font-family: system-ui, sans-serif; padding: 40px 16px; }
+    .wrapper { max-width: 960px; margin: 0 auto; }
+    h1 { font-size: 1.1rem; font-weight: 600; color: #18181b; margin-bottom: 8px; }
+    p  { font-size: 0.85rem; color: #71717a; margin-bottom: 24px; }
+    iframe {
+      width: 100%;
+      border: none;
+      border-radius: 12px;
+      display: block;
+      background: #141414;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+      transition: height 0.2s ease;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <h1>Test d'intégration iFrame — Simulateur DCA Crypto</h1>
+    <p>La hauteur de l'iframe s'ajuste automatiquement via postMessage. Ouvrir depuis un serveur local.</p>
+    <iframe
+      id="sim"
+      src="http://localhost:3000?embedded=true"
+      scrolling="no"
+      title="Simulateur DCA Crypto"
+    ></iframe>
+  </div>
+
+  <script>
+    const iframe = document.getElementById('sim');
+    window.addEventListener('message', (event) => {
+      if (event.data?.type === 'simulateur-crypto-resize') {
+        iframe.style.height = event.data.height + 'px';
+      }
+    });
+  </script>
+</body>
+</html>

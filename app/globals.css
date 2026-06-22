@@ -1,0 +1,170 @@
+@import "tailwindcss";
+
+/* Class-based dark mode — the <html> element carries the `.dark` class. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ------------------------------------------------------------------ */
+/*  S'investir design tokens                                          */
+/* ------------------------------------------------------------------ */
+@theme {
+  /* Typography — Lexend is injected by next/font as --font-lexend */
+  --font-sans:
+    var(--font-lexend), "BlinkMacSystemFont", "Segoe UI", "Helvetica Neue",
+    Arial, "Noto Sans", sans-serif;
+
+  /* Brand */
+  --color-primary: #1098f7;
+  --color-primary-hover: #0c84db;
+  --color-secondary: #f8d047;
+  --color-secondary-hover: #f2c521;
+
+  /* Surfaces */
+  --color-background: #141414; /* page (oklch 20.5%) */
+  --color-surface: #1e1e1e; /* elevated card */
+  --color-surface-hover: #242424;
+  --color-input: #0a0a0a;
+
+  /* Text */
+  --color-foreground: #ffffff;
+  --color-muted: #6b7280;
+
+  /* Borders */
+  --color-border: #ffffff14; /* ~8% white */
+  --color-border-strong: #ffffff20; /* ~12.5% white */
+
+  /* Semantic */
+  --color-gain: #22c55e;
+  --color-loss: #ef4444;
+
+  /* Radii */
+  --radius-badge: 8px;
+  --radius-control: 12px; /* inputs & buttons */
+  --radius-card: 20px;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Base                                                              */
+/* ------------------------------------------------------------------ */
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    min-height: 100dvh;
+    background-color: var(--color-background);
+    background-image:
+      radial-gradient(
+        48rem 48rem at 8% -8%,
+        color-mix(in oklab, var(--color-primary) 10%, transparent),
+        transparent 60%
+      ),
+      radial-gradient(
+        42rem 42rem at 108% 4%,
+        color-mix(in oklab, var(--color-secondary) 7%, transparent),
+        transparent 55%
+      );
+    background-attachment: fixed;
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Thin, theme-aware scrollbars */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border-strong) transparent;
+  }
+
+  ::selection {
+    background-color: color-mix(in oklab, var(--color-primary) 30%, transparent);
+    color: #fff;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/*  Components                                                        */
+/* ------------------------------------------------------------------ */
+@layer components {
+  /* Custom range slider — track filled to --range-percent, white thumb. */
+  .range-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 6px;
+    border-radius: 9999px;
+    background: linear-gradient(
+      to right,
+      var(--color-primary) 0%,
+      var(--color-primary) var(--range-percent, 0%),
+      #ffffff1a var(--range-percent, 0%),
+      #ffffff1a 100%
+    );
+    outline: none;
+    cursor: pointer;
+  }
+
+  .range-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 9999px;
+    background: #ffffff;
+    border: 2px solid var(--color-primary);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
+    transition:
+      transform 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+  .range-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.12);
+  }
+  .range-slider:focus-visible::-webkit-slider-thumb {
+    box-shadow: 0 0 0 4px color-mix(in oklab, var(--color-primary) 35%, transparent);
+  }
+
+  .range-slider::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--color-primary);
+    border-radius: 9999px;
+    background: #ffffff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
+    cursor: pointer;
+  }
+  .range-slider::-moz-range-track {
+    background: transparent;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/*  Utilities                                                         */
+/* ------------------------------------------------------------------ */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@layer utilities {
+  .animate-fade-in-up {
+    animation: fade-in-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-fade-in-up {
+      animation: none;
+    }
+  }
+}
