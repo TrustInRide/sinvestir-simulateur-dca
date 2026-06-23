@@ -3,22 +3,16 @@
 import { useMemo, useState } from "react";
 import type { FormEvent } from "react";
 import { CryptoSearch } from "@/components/CryptoSearch";
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { Button } from "@/components/ui/Button";
 import type { CoinSearchResult, DCAParams, Frequency } from "@/lib/types";
 
 const FREQUENCY_OPTIONS: { value: Frequency; label: string }[] = [
-  { value: "one-shot", label: "Investissement unique" },
-  { value: "daily", label: "Quotidien" },
-  { value: "weekly", label: "Hebdomadaire" },
-  { value: "monthly", label: "Mensuel" },
+  { value: "one-shot", label: "En une fois" },
+  { value: "daily", label: "Par jour" },
+  { value: "weekly", label: "Par semaine" },
+  { value: "monthly", label: "Par mois" },
 ];
 
 const MIN_DATE = "2010-01-01";
@@ -102,14 +96,14 @@ export function SimulatorForm({ onSubmit, isLoading, defaultCoin }: SimulatorFor
   }
 
   return (
-    <Card className="h-full">
-      <CardHeader>
-        <CardTitle>Paramètres</CardTitle>
-        <CardDescription>Configurez votre stratégie d’investissement</CardDescription>
-      </CardHeader>
+    <div className="@container flex h-full flex-col">
+      <h2 className="mb-6 text-lg font-semibold tracking-tight text-foreground">
+        Vos paramètres
+      </h2>
 
-      <form className="@container space-y-4" onSubmit={handleSubmit} noValidate>
+      <form className="flex flex-1 flex-col gap-6" onSubmit={handleSubmit} noValidate>
         <CryptoSearch
+          label="Actif numérique"
           selected={coin}
           onSelect={setCoin}
           onClear={() => setCoin(null)}
@@ -119,7 +113,8 @@ export function SimulatorForm({ onSubmit, isLoading, defaultCoin }: SimulatorFor
         />
 
         <Input
-          label="Montant investi"
+          label="Montant"
+          info="Somme placée à chaque échéance, en euros."
           type="number"
           inputMode="decimal"
           min={1}
@@ -127,21 +122,23 @@ export function SimulatorForm({ onSubmit, isLoading, defaultCoin }: SimulatorFor
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
           onBlur={() => setTouched((t) => ({ ...t, amount: true }))}
-          prefix="€"
+          suffix="EUR"
           placeholder="50"
           error={touched.amount ? errors.amount : undefined}
         />
 
         <Select
           label="Fréquence"
+          info="Cadence des versements : en une fois, par jour, par semaine ou par mois."
           value={frequency}
           onChange={(e) => setFrequency(e.target.value as Frequency)}
           options={FREQUENCY_OPTIONS}
         />
 
-        <div className="grid grid-cols-1 gap-4 @[20rem]:grid-cols-2">
+        <div className="grid grid-cols-1 gap-x-5 gap-y-6 @[20rem]:grid-cols-2">
           <Input
-            label="Date de début"
+            label="Depuis"
+            info="Début de la période simulée."
             type="date"
             value={start}
             min={MIN_DATE}
@@ -151,7 +148,7 @@ export function SimulatorForm({ onSubmit, isLoading, defaultCoin }: SimulatorFor
             error={touched.start ? errors.start : undefined}
           />
           <Input
-            label="Date de fin"
+            label="Jusqu’au"
             type="date"
             value={end}
             min={start || MIN_DATE}
@@ -168,11 +165,11 @@ export function SimulatorForm({ onSubmit, isLoading, defaultCoin }: SimulatorFor
           size="lg"
           disabled={!isValid || isLoading}
           isLoading={isLoading}
-          className="mt-1"
+          className="mt-auto"
         >
-          {isLoading ? "Calcul en cours…" : "Calculer"}
+          {isLoading ? "Calcul en cours…" : "Calculer la simulation"}
         </Button>
       </form>
-    </Card>
+    </div>
   );
 }

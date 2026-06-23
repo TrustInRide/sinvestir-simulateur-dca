@@ -3,15 +3,18 @@
 import { forwardRef, useId } from "react";
 import type { InputHTMLAttributes, ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import { FieldLabel } from "@/components/ui/FieldLabel";
 
 export interface InputProps
   extends Omit<InputHTMLAttributes<HTMLInputElement>, "prefix"> {
   label?: string;
+  /** Small help text shown via an (i) affordance next to the label. */
+  info?: string;
   hint?: string;
   error?: string;
-  /** Inline leading adornment, e.g. a currency symbol. */
+  /** Inline leading adornment, e.g. a search icon. */
   prefix?: ReactNode;
-  /** Inline trailing adornment, e.g. a unit. */
+  /** Inline trailing adornment / unit, e.g. `EUR`, `%`. */
   suffix?: ReactNode;
   containerClassName?: string;
 }
@@ -19,6 +22,7 @@ export interface InputProps
 export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
   {
     label,
+    info,
     hint,
     error,
     prefix,
@@ -40,25 +44,18 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
 
   return (
     <div className={cn("flex min-w-0 flex-col gap-1.5", containerClassName)}>
-      {label && (
-        <label
-          htmlFor={inputId}
-          className="text-sm font-medium text-foreground/90"
-        >
-          {label}
-        </label>
-      )}
+      {label && <FieldLabel htmlFor={inputId} info={info}>{label}</FieldLabel>}
 
+      {/* Underline field — matches simulateurs.sinvestir.fr inputs */}
       <div
         className={cn(
-          "flex items-center rounded-control border bg-input transition-colors",
-          "border-border-strong focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/30",
-          error &&
-            "border-loss focus-within:border-loss focus-within:ring-loss/30",
+          "flex items-center gap-2 border-b bg-transparent transition-colors",
+          "border-border-strong focus-within:border-primary",
+          error && "border-loss focus-within:border-loss",
         )}
       >
         {prefix != null && (
-          <span className="pl-3.5 text-sm text-muted">{prefix}</span>
+          <span className="flex shrink-0 items-center text-muted">{prefix}</span>
         )}
         <input
           ref={ref}
@@ -66,16 +63,17 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
           aria-invalid={error ? true : undefined}
           aria-describedby={describedBy}
           className={cn(
-            "h-11 w-full min-w-0 bg-transparent px-3.5 text-sm text-foreground outline-none placeholder:text-muted",
+            "h-10 w-full min-w-0 bg-transparent text-base text-foreground outline-none placeholder:text-muted/70",
             "[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none",
-            prefix != null && "pl-2",
-            suffix != null && "pr-2",
+            "[color-scheme:dark] [&::-webkit-calendar-picker-indicator]:opacity-50 [&::-webkit-calendar-picker-indicator]:hover:opacity-90",
             className,
           )}
           {...props}
         />
         {suffix != null && (
-          <span className="pr-3.5 text-sm text-muted">{suffix}</span>
+          <span className="shrink-0 text-xs font-medium uppercase tracking-wide text-muted">
+            {suffix}
+          </span>
         )}
       </div>
 

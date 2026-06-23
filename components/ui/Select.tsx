@@ -3,6 +3,7 @@
 import { forwardRef, useId } from "react";
 import type { ReactNode, SelectHTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
+import { FieldLabel } from "@/components/ui/FieldLabel";
 
 export interface SelectOption {
   value: string;
@@ -11,6 +12,7 @@ export interface SelectOption {
 
 export interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
   label?: string;
+  info?: string;
   hint?: string;
   error?: string;
   /** Convenience prop — renders `<option>`s. Falls back to `children`. */
@@ -22,6 +24,7 @@ export interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
 export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select(
   {
     label,
+    info,
     hint,
     error,
     options,
@@ -43,25 +46,24 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
 
   return (
     <div className={cn("flex min-w-0 flex-col gap-1.5", containerClassName)}>
-      {label && (
-        <label
-          htmlFor={selectId}
-          className="text-sm font-medium text-foreground/90"
-        >
-          {label}
-        </label>
-      )}
+      {label && <FieldLabel htmlFor={selectId} info={info}>{label}</FieldLabel>}
 
-      <div className="relative">
+      {/* Underline field — matches simulateurs.sinvestir.fr */}
+      <div
+        className={cn(
+          "relative flex items-center border-b transition-colors",
+          "border-border-strong focus-within:border-primary",
+          error && "border-loss focus-within:border-loss",
+        )}
+      >
         <select
           ref={ref}
           id={selectId}
           aria-invalid={error ? true : undefined}
           aria-describedby={describedBy}
           className={cn(
-            "h-11 w-full min-w-0 cursor-pointer appearance-none rounded-control border bg-input pl-3.5 pr-10 text-sm text-foreground outline-none transition-colors",
-            "border-border-strong [color-scheme:dark] focus:border-primary focus:ring-2 focus:ring-primary/30",
-            error && "border-loss focus:border-loss focus:ring-loss/30",
+            "h-10 w-full min-w-0 cursor-pointer appearance-none bg-transparent pr-8 text-base text-foreground outline-none",
+            "[color-scheme:dark]",
             className,
           )}
           {...props}
@@ -76,7 +78,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
         </select>
 
         <svg
-          className="pointer-events-none absolute right-3.5 top-1/2 size-4 -translate-y-1/2 text-muted"
+          className="pointer-events-none absolute right-0 top-1/2 size-4 -translate-y-1/2 text-muted"
           viewBox="0 0 20 20"
           fill="none"
           aria-hidden="true"

@@ -1,23 +1,22 @@
 "use client";
 
 import { useState } from "react";
-import { PortfolioChart } from "@/components/PortfolioChart";
+import type { ReactNode } from "react";
 import { HistoriqueChart } from "@/components/HistoriqueChart";
+import { GainsPertesChart } from "@/components/GainsPertesChart";
 import type { DCAResult } from "@/lib/types";
-import { formatEUR, formatEURSigned, formatPercent } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 type Tab = "graphiques" | "calendrier";
-type ChartType = "gains-pertes" | "historique";
 
 interface ChartSectionProps {
   result: DCAResult | null;
   isLoading: boolean;
+  symbol?: string;
 }
 
-export function ChartSection({ result, isLoading }: ChartSectionProps) {
+export function ChartSection({ result, isLoading, symbol }: ChartSectionProps) {
   const [tab, setTab] = useState<Tab>("graphiques");
-  const [chartType, setChartType] = useState<ChartType>("gains-pertes");
 
   return (
     <div className="mt-8">
@@ -41,79 +40,26 @@ export function ChartSection({ result, isLoading }: ChartSectionProps) {
       </div>
 
       {tab === "graphiques" && (
-        <div className="mt-6">
-          {/* Large metrics */}
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 mb-6">
-            <LargeMetric
-              label="Total investi"
-              value={result ? formatEUR(result.totalInvested) : "—"}
-            />
-            <LargeMetric
-              label="Valeur finale"
-              value={result ? formatEUR(result.finalValue) : "—"}
-            />
-            <LargeMetric
-              label="Gain / Perte"
-              value={result ? formatEURSigned(result.gainLoss) : "—"}
-              tone={
-                result
-                  ? result.gainLoss >= 0
-                    ? "gain"
-                    : "loss"
-                  : "default"
-              }
-              sub={result ? formatPercent(result.gainLossPercent) : undefined}
-            />
-          </div>
-
-          {/* Chart type toggle */}
-          <div className="flex items-center justify-end gap-2 mb-3">
-            <span className="text-xs text-muted">Type de graphique</span>
-            <div className="flex gap-0.5 rounded-lg bg-white/[0.06] p-1">
-              <button
-                onClick={() => setChartType("gains-pertes")}
-                title="Gains / Pertes"
-                className={cn(
-                  "rounded p-1.5 transition-colors",
-                  chartType === "gains-pertes"
-                    ? "bg-white/10 text-foreground"
-                    : "text-muted hover:text-foreground",
-                )}
-              >
-                <LineChartIcon />
-              </button>
-              <button
-                onClick={() => setChartType("historique")}
-                title="Historique"
-                className={cn(
-                  "rounded p-1.5 transition-colors",
-                  chartType === "historique"
-                    ? "bg-white/10 text-foreground"
-                    : "text-muted hover:text-foreground",
-                )}
-              >
-                <MultiLineIcon />
-              </button>
-            </div>
-          </div>
-
-          {/* Chart */}
-          {chartType === "gains-pertes" ? (
-            <PortfolioChart
-              data={result?.portfolioHistory ?? null}
-              isLoading={isLoading}
-            />
-          ) : (
+        <div className="mt-6 space-y-6">
+          <ChartPanel title="Historique" icon={<ChartBarsIcon />}>
             <HistoriqueChart
               data={result?.portfolioHistory ?? null}
               isLoading={isLoading}
+              unitSymbol={symbol}
             />
-          )}
+          </ChartPanel>
+
+          <ChartPanel title="Gains / Pertes" icon={<ChartBarsIcon />}>
+            <GainsPertesChart
+              data={result?.portfolioHistory ?? null}
+              isLoading={isLoading}
+            />
+          </ChartPanel>
         </div>
       )}
 
       {tab === "calendrier" && (
-        <div className="mt-6 flex min-h-[200px] items-center justify-center rounded-control border border-dashed border-border-strong bg-white/[0.02] text-sm text-muted">
+        <div className="mt-6 flex min-h-[200px] items-center justify-center rounded-card border border-dashed border-border-strong bg-white/[0.02] text-sm text-muted">
           Vue Calendrier — fonctionnalité à venir
         </div>
       )}
@@ -122,45 +68,25 @@ export function ChartSection({ result, isLoading }: ChartSectionProps) {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Large metric                                                       */
+/*  Chart panel — branded title header + body (mirrors the crypto sim) */
 /* ------------------------------------------------------------------ */
 
-function LargeMetric({
-  label,
-  value,
-  tone = "default",
-  sub,
+function ChartPanel({
+  title,
+  icon,
+  children,
 }: {
-  label: string;
-  value: string;
-  tone?: "default" | "gain" | "loss";
-  sub?: string;
+  title: string;
+  icon: ReactNode;
+  children: ReactNode;
 }) {
   return (
-    <div>
-      <p className="text-xs text-muted mb-1">{label}</p>
-      <p
-        className={cn(
-          "text-2xl font-semibold tabular-nums tracking-tight",
-          tone === "gain" && "text-gain",
-          tone === "loss" && "text-loss",
-          tone === "default" && "text-foreground",
-        )}
-      >
-        {value}
-      </p>
-      {sub && (
-        <p
-          className={cn(
-            "text-xs tabular-nums mt-0.5",
-            tone === "gain" && "text-gain/70",
-            tone === "loss" && "text-loss/70",
-            tone === "default" && "text-muted",
-          )}
-        >
-          {sub}
-        </p>
-      )}
+    <div className="overflow-hidden rounded-card border border-border-strong bg-surface/60">
+      <div className="flex items-center gap-2.5 bg-gradient-to-r from-primary to-[#0a6fd8] px-4 py-2.5 text-white">
+        <span className="text-white/90">{icon}</span>
+        <span className="text-sm font-semibold tracking-wide">{title}</span>
+      </div>
+      <div className="p-4 sm:p-5">{children}</div>
     </div>
   );
 }
@@ -172,13 +98,7 @@ function LargeMetric({
 function GraphIcon() {
   return (
     <svg className="size-3.5" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-      <path
-        d="M2 12l3-4 3 2 3-5 3 2"
-        stroke="currentColor"
-        strokeWidth="1.4"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+      <path d="M2 12l3-4 3 2 3-5 3 2" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
@@ -192,25 +112,13 @@ function CalendarIcon() {
   );
 }
 
-function LineChartIcon() {
+function ChartBarsIcon() {
   return (
     <svg className="size-4" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-      <path
-        d="M2 11 6 7l3 3 5-6"
-        stroke="currentColor"
-        strokeWidth="1.4"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function MultiLineIcon() {
-  return (
-    <svg className="size-4" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-      <path d="M2 12 5 8l3 1 5-5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M2 13.5 6 10l2 2 6-5" stroke="#a78bfa" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M2 14V2M2 14h12" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+      <rect x="4" y="8" width="2.2" height="4" rx="0.6" fill="currentColor" />
+      <rect x="7.4" y="5" width="2.2" height="7" rx="0.6" fill="currentColor" />
+      <rect x="10.8" y="9.5" width="2.2" height="2.5" rx="0.6" fill="currentColor" />
     </svg>
   );
 }

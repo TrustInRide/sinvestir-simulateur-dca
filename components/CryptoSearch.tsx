@@ -5,6 +5,7 @@ import type { KeyboardEvent } from "react";
 import { searchCoins } from "@/lib/coingecko";
 import type { CoinSearchResult } from "@/lib/types";
 import { Input } from "@/components/ui/Input";
+import { FieldLabel } from "@/components/ui/FieldLabel";
 import { cn } from "@/lib/utils";
 
 type Status = "idle" | "loading" | "results" | "empty" | "error";
@@ -137,9 +138,9 @@ export function CryptoSearch({
 
   return (
     <div className="flex min-w-0 flex-col gap-1.5">
-      <label htmlFor={fieldId} className="text-sm font-medium text-foreground/90">
+      <FieldLabel htmlFor={fieldId} info="Plus de 7 000 cryptomonnaies via CoinGecko. Tapez un nom puis sélectionnez dans la liste.">
         {label}
-      </label>
+      </FieldLabel>
 
       <div ref={containerRef} className="relative">
         <Input

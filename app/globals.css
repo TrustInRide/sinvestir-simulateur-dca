@@ -26,7 +26,8 @@
 
   /* Text */
   --color-foreground: #ffffff;
-  --color-muted: #6b7280;
+  --color-muted: #9ca3af; /* matches S'investir --color-text-muted: 156 163 175 */
+  --color-label: #7e8aa3; /* desaturated blue-grey form labels */
 
   /* Borders */
   --color-border: #ffffff0d; /* ~5% white — matches S'investir .card border rgba(255,255,255,0.05) */

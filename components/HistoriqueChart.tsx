@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Area,
   CartesianGrid,
   ComposedChart,
   Line,
@@ -10,18 +11,18 @@ import {
   YAxis,
 } from "recharts";
 import type { PortfolioPoint } from "@/lib/types";
-import { formatEUR, formatEURCompact } from "@/lib/format";
+import { formatEUR, formatEURCompact, formatUnits } from "@/lib/format";
 
-const PRIMARY = "#1098f7";
-const SECONDARY = "#f8d047";
-const UNITS_COLOR = "#a78bfa";
+const VALEUR = "#1098f7"; // portfolio value (blue area)
+const INVESTI = "#f8d047"; // cumulative invested (gold)
+const ACQUIS = "#a78bfa"; // accumulated units (purple, right axis)
 const AXIS = "#6b7280";
 
 const MAX_POINTS = 420;
 
 interface HistoriqueDatum {
   t: number;
-  price: number | null;
+  value: number;
   invested: number;
   units: number;
 }
@@ -35,13 +36,12 @@ function prepare(points: PortfolioPoint[]): HistoriqueDatum[] {
           { length: MAX_POINTS },
           (_, i) => points[Math.round((i * (n - 1)) / (MAX_POINTS - 1))],
         );
-
-  let lastPrice: number | null = null;
-  return src.map((p) => {
-    const price = p.units > 0 ? p.value / p.units : lastPrice;
-    if (price !== null) lastPrice = price;
-    return { t: p.date.getTime(), price, invested: p.invested, units: p.units };
-  });
+  return src.map((p) => ({
+    t: p.date.getTime(),
+    value: p.value,
+    invested: p.invested,
+    units: p.units,
+  }));
 }
 
 const axisMonthFmt = new Intl.DateTimeFormat("fr-FR", {
@@ -59,39 +59,32 @@ function formatAxisDate(t: number): string {
   return label.charAt(0).toUpperCase() + label.slice(1);
 }
 
-function formatUnits(n: number): string {
-  if (n === 0) return "0";
-  if (n < 0.0001) return n.toExponential(2);
-  if (n < 0.01) return n.toFixed(6);
-  if (n < 1) return n.toFixed(4);
-  if (n < 1000) return n.toFixed(3);
-  return n.toLocaleString("fr-FR", { maximumFractionDigits: 2 });
-}
-
 interface HistoriqueChartProps {
   data: PortfolioPoint[] | null;
   isLoading: boolean;
+  unitSymbol?: string;
 }
 
-export function HistoriqueChart({ data, isLoading }: HistoriqueChartProps) {
+export function HistoriqueChart({ data, isLoading, unitSymbol }: HistoriqueChartProps) {
   if (isLoading) return <ChartSkeleton />;
   if (!data || data.length === 0) return null;
 
   const chartData = prepare(data);
+  const sym = (unitSymbol ?? "").toUpperCase();
 
   return (
     <div className="w-full">
-      <ChartLegend />
+      <ChartLegend sym={sym} />
       <ResponsiveContainer width="100%" height={300}>
-        <ComposedChart
-          data={chartData}
-          margin={{ top: 8, right: 56, bottom: 0, left: 0 }}
-        >
-          <CartesianGrid
-            strokeDasharray="1 1"
-            stroke="#ffffff08"
-            vertical={false}
-          />
+        <ComposedChart data={chartData} margin={{ top: 8, right: 56, bottom: 0, left: 0 }}>
+          <defs>
+            <linearGradient id="hist-valeur" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor={VALEUR} stopOpacity={0.28} />
+              <stop offset="100%" stopColor={VALEUR} stopOpacity={0} />
+            </linearGradient>
+          </defs>
+
+          <CartesianGrid strokeDasharray="1 1" stroke="#ffffff08" vertical={false} />
 
           <XAxis
             dataKey="t"
@@ -106,7 +99,7 @@ export function HistoriqueChart({ data, isLoading }: HistoriqueChartProps) {
             tick={{ fill: AXIS, fontSize: 11 }}
           />
 
-          {/* Left Y — price & invested (€) */}
+          {/* Left Y — euros (value & invested) */}
           <YAxis
             yAxisId="eur"
             orientation="left"
@@ -119,11 +112,11 @@ export function HistoriqueChart({ data, isLoading }: HistoriqueChartProps) {
             tick={{ fill: AXIS, fontSize: 11 }}
           />
 
-          {/* Right Y — crypto units */}
+          {/* Right Y — accumulated units */}
           <YAxis
             yAxisId="units"
             orientation="right"
-            tickFormatter={formatUnits}
+            tickFormatter={(v: number) => formatUnits(v)}
             width={56}
             tickLine={false}
             axisLine={false}
@@ -132,29 +125,25 @@ export function HistoriqueChart({ data, isLoading }: HistoriqueChartProps) {
             tick={{ fill: AXIS, fontSize: 11 }}
           />
 
-          <Tooltip
-            content={<CustomTooltip />}
-            cursor={{ stroke: "#ffffff20", strokeWidth: 1 }}
-          />
+          <Tooltip content={<CustomTooltip sym={sym} />} cursor={{ stroke: "#ffffff20", strokeWidth: 1 }} />
 
-          <Line
+          <Area
             yAxisId="eur"
             type="monotone"
-            dataKey="price"
-            name="Prix"
-            stroke={PRIMARY}
-            strokeWidth={2}
-            dot={false}
-            activeDot={{ r: 4, fill: PRIMARY, stroke: "#09090f", strokeWidth: 2 }}
+            dataKey="value"
+            name="Valeur"
+            stroke={VALEUR}
+            strokeWidth={2.4}
+            fill="url(#hist-valeur)"
+            activeDot={{ r: 4, fill: VALEUR, stroke: "#09090f", strokeWidth: 2 }}
             animationDuration={650}
-            connectNulls
           />
           <Line
             yAxisId="eur"
             type="stepAfter"
             dataKey="invested"
             name="Investi"
-            stroke={SECONDARY}
+            stroke={INVESTI}
             strokeWidth={2}
             strokeDasharray="4 4"
             dot={false}
@@ -163,13 +152,13 @@ export function HistoriqueChart({ data, isLoading }: HistoriqueChartProps) {
           />
           <Line
             yAxisId="units"
-            type="stepAfter"
+            type="monotone"
             dataKey="units"
-            name="Unités"
-            stroke={UNITS_COLOR}
+            name="Acquis"
+            stroke={ACQUIS}
             strokeWidth={2}
             dot={false}
-            activeDot={{ r: 4, fill: UNITS_COLOR, stroke: "#09090f", strokeWidth: 2 }}
+            activeDot={{ r: 4, fill: ACQUIS, stroke: "#09090f", strokeWidth: 2 }}
             animationDuration={650}
           />
         </ComposedChart>
@@ -178,11 +167,11 @@ export function HistoriqueChart({ data, isLoading }: HistoriqueChartProps) {
   );
 }
 
-function ChartLegend() {
+function ChartLegend({ sym }: { sym: string }) {
   const items = [
-    { color: PRIMARY, label: "Prix de la crypto" },
-    { color: SECONDARY, label: "Total investi" },
-    { color: UNITS_COLOR, label: "Unités accumulées" },
+    { color: VALEUR, label: "Valeur du portefeuille" },
+    { color: INVESTI, label: "Total investi" },
+    { color: ACQUIS, label: sym ? `Acquis (${sym})` : "Acquis" },
   ];
   return (
     <div className="mb-3 flex flex-wrap items-center justify-end gap-4 text-xs text-muted">
@@ -198,17 +187,16 @@ function ChartLegend() {
 
 interface TooltipPayload {
   payload: HistoriqueDatum;
-  name: string;
-  color: string;
-  value: number | null;
 }
 
 function CustomTooltip({
   active,
   payload,
+  sym,
 }: {
   active?: boolean;
   payload?: TooltipPayload[];
+  sym: string;
 }) {
   if (!active || !payload?.length) return null;
   const d = payload[0].payload;
@@ -219,11 +207,9 @@ function CustomTooltip({
         {tooltipDateFmt.format(new Date(d.t))}
       </p>
       <dl className="space-y-1.5 text-xs">
-        {d.price !== null && (
-          <Row color={PRIMARY} label="Prix" value={formatEUR(d.price)} />
-        )}
-        <Row color={SECONDARY} label="Investi" value={formatEUR(d.invested)} />
-        <Row color={UNITS_COLOR} label="Unités" value={formatUnits(d.units)} />
+        <Row color={VALEUR} label="Valeur" value={formatEUR(d.value)} />
+        <Row color={INVESTI} label="Investi" value={formatEUR(d.invested)} />
+        <Row color={ACQUIS} label="Acquis" value={`${formatUnits(d.units)}${sym ? ` ${sym}` : ""}`} />
       </dl>
     </div>
   );
@@ -245,8 +231,8 @@ function ChartSkeleton() {
   return (
     <div className="w-full">
       <div className="mb-3 flex items-center justify-end gap-4">
-        {[28, 20, 32].map((w) => (
-          <div key={w} className={`h-3 w-${w} animate-pulse rounded bg-white/10`} />
+        {[28, 20, 24].map((w) => (
+          <div key={w} className="h-3 animate-pulse rounded bg-white/10" style={{ width: w * 4 }} />
         ))}
       </div>
       <div className="relative h-[300px] w-full overflow-hidden rounded-control bg-white/[0.03]">

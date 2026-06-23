@@ -125,12 +125,14 @@ export function calculateDCA(
 
   let units = 0;
   let invested = 0;
+  let contributions = 0;
   const portfolioHistory: PortfolioPoint[] = buckets.map((bucket, i) => {
     // Buy first (at this day's price), then snapshot the portfolio so the
     // value reflects the freshly purchased units.
     if (investDays.has(i) && bucket.price > 0) {
       units += amount / bucket.price;
       invested += amount;
+      contributions += 1;
     }
     return {
       date: bucket.date,
@@ -144,6 +146,7 @@ export function calculateDCA(
   const finalValue = units * lastPrice;
   const gainLoss = finalValue - invested;
   const gainLossPercent = invested > 0 ? (gainLoss / invested) * 100 : 0;
+  const averagePrice = units > 0 ? invested / units : 0;
 
   return {
     totalInvested: invested,
@@ -151,6 +154,8 @@ export function calculateDCA(
     gainLoss,
     gainLossPercent,
     totalUnits: units,
+    contributions,
+    averagePrice,
     portfolioHistory,
   };
 }

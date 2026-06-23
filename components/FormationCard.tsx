@@ -14,7 +14,7 @@ export function FormationCard() {
             href="https://sinvestir.fr/formation-offerte"
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-5 inline-flex items-center gap-2 rounded-control bg-primary px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary-hover"
+            className="mt-5 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#1a9bf7] to-[#0a6fd8] px-6 py-2.5 text-sm font-semibold text-white shadow-[0_8px_20px_-8px_rgba(16,152,247,0.6)] transition-opacity hover:opacity-95"
           >
             Accéder à la formation
           </a>

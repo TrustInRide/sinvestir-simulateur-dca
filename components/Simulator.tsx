@@ -65,11 +65,11 @@ export function Simulator({ defaultCoin, embedded = false }: SimulatorProps) {
 
   return (
     <div className="flex flex-1 flex-col">
-      {/* Two-column: form (2/5) · metrics (3/5) */}
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-5">
+      {/* Two-column: form (2/5) · metrics (3/5) — stacks below lg to breathe next to the rail */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
         <section
           aria-label="Formulaire simulateur"
-          className="animate-fade-in-up min-w-0 md:col-span-2"
+          className="animate-fade-in-up min-w-0 lg:col-span-2"
           style={{ animationDelay: "80ms" }}
         >
           <SimulatorForm
@@ -81,7 +81,7 @@ export function Simulator({ defaultCoin, embedded = false }: SimulatorProps) {
 
         <section
           aria-label="Résultats"
-          className="animate-fade-in-up min-w-0 md:col-span-3"
+          className="animate-fade-in-up min-w-0 lg:col-span-3"
           style={{ animationDelay: "160ms" }}
         >
           <ResultsPanel
@@ -110,7 +110,7 @@ export function Simulator({ defaultCoin, embedded = false }: SimulatorProps) {
             Enregistrer la simulation
           </Button>
           <Button
-            variant="ghost"
+            variant="light"
             size="lg"
             disabled={status !== "success"}
             className="sm:min-w-52"
@@ -127,7 +127,11 @@ export function Simulator({ defaultCoin, embedded = false }: SimulatorProps) {
           className="animate-fade-in-up mt-2"
           style={{ animationDelay: "300ms" }}
         >
-          <ChartSection result={result} isLoading={status === "loading"} />
+          <ChartSection
+            result={result}
+            isLoading={status === "loading"}
+            symbol={params?.coinSymbol}
+          />
         </div>
       )}
     </div>

@@ -49,5 +49,9 @@ export interface DCAResult {
   gainLoss: number;
   gainLossPercent: number;
   totalUnits: number;
+  /** Number of effective purchases (used for "Investi … en N versements"). */
+  contributions: number;
+  /** Average acquisition price: `totalInvested / totalUnits`. */
+  averagePrice: number;
   portfolioHistory: PortfolioPoint[];
 }

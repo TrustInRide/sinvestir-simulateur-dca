@@ -1,6 +1,7 @@
 import { Simulator } from "@/components/Simulator";
 import { SimulateursSidebar } from "@/components/SimulateursSidebar";
 import { FormationCard } from "@/components/FormationCard";
+import { SInvestirLogo } from "@/components/SInvestirLogo";
 import { EmbedHeightReporter } from "@/components/EmbedHeightReporter";
 
 export default async function Home({
@@ -34,24 +35,21 @@ export default async function Home({
 
       <div className="flex min-w-0 flex-1 flex-col">
         {/* Top bar */}
-        <header className="flex items-center justify-between border-b border-border px-6 py-3">
-          <div className="flex-1" />
-          <div className="flex items-center gap-2.5">
-            <SInvestirLogo />
-            <span className="text-sm font-bold tracking-[0.2em] text-foreground uppercase">
+        <header className="flex h-20 items-center justify-between gap-4 border-b border-border px-6 lg:px-8">
+          <div className="flex items-center gap-3.5">
+            <SInvestirLogo className="h-12" />
+            <span className="text-lg font-semibold tracking-[0.22em] text-foreground uppercase">
               Simulateurs
             </span>
           </div>
-          <div className="flex flex-1 justify-end">
-            <a
-              href="https://sinvestir.fr"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm text-muted transition-colors hover:text-foreground"
-            >
-              Découvrir S&apos;investir
-            </a>
-          </div>
+          <a
+            href="https://sinvestir.fr"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden text-sm font-medium text-muted transition-colors hover:text-foreground sm:inline-flex"
+          >
+            Découvrir S&apos;investir
+          </a>
         </header>
 
         {/* Page content */}
@@ -68,7 +66,7 @@ export default async function Home({
               </div>
 
               <p className="mb-4 text-sm font-medium text-primary sm:text-base">
-                Visualisez l'évolution passée de votre investissement progressif en cryptomonnaies
+                Visualisez l’évolution passée de votre investissement progressif en cryptomonnaies
               </p>
 
               <p className="mx-auto mb-6 max-w-2xl text-sm leading-relaxed text-muted">
@@ -106,13 +104,16 @@ export default async function Home({
         </main>
 
         {/* Footer */}
-        <footer className="border-t border-border px-6 py-5">
-          <div className="mx-auto flex max-w-5xl flex-col items-start justify-between gap-2 text-xs text-muted sm:flex-row sm:items-center">
-            <p>Données de marché : Coinbase &amp; CoinGecko</p>
+        <footer className="border-t border-border px-6 py-6">
+          <div className="mx-auto flex max-w-5xl flex-col items-center gap-2 text-center text-xs text-muted">
             <p>
               Copyright © {year} | CGVU | Mentions légales | Politique de
               confidentialité | Notice simulateur | Création{" "}
-              <span className="text-foreground/60">PULSION STUDIO</span>
+              <span className="text-foreground/70">PULSION STUDIO</span>
+            </p>
+            <p className="text-muted/70">
+              Données de marché : Coinbase &amp; CoinGecko · Outil pédagogique,
+              sans conseil financier
             </p>
           </div>
         </footer>
@@ -122,31 +123,7 @@ export default async function Home({
 }
 
 /* ------------------------------------------------------------------ */
-/*  S'investir logo mark                                               */
+/*  Header "NOUVEAUTÉ" callout                                          */
 /* ------------------------------------------------------------------ */
 
-function SInvestirLogo() {
-  return (
-    <div className="flex size-8 items-center justify-center rounded-full border border-secondary/40 bg-secondary/10">
-      <svg
-        viewBox="0 0 20 20"
-        fill="none"
-        className="size-5"
-        aria-label="S'investir"
-      >
-        <path
-          d="M14 6.5C13.2 4.7 11.2 3.5 9 3.5c-3 0-5.5 2.2-5.5 5s2.5 5 5.5 5c2.2 0 4.2-1.2 5-3"
-          stroke="#f8d047"
-          strokeWidth="1.8"
-          strokeLinecap="round"
-        />
-        <path
-          d="M11 9.5c-.5-1.2-1.5-2-2.5-2-1.4 0-2.5 1.1-2.5 2.5S7.1 12.5 8.5 12.5c1 0 2-.8 2.5-2"
-          stroke="#f8d047"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-        />
-      </svg>
-    </div>
-  );
-}
+/* (header right-side now a simple "Découvrir S'investir" link — see header above) */
