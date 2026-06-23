@@ -9,7 +9,6 @@ import {
 } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
-import { PortfolioChart } from "@/components/PortfolioChart";
 import type { DCAParams, DCAResult, Frequency } from "@/lib/types";
 import { formatEUR, formatEURSigned, formatPercent } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -61,6 +60,7 @@ export function ResultsPanel({
       {status === "success" && result && (
         <SuccessState result={result} params={params} />
       )}
+
     </Card>
   );
 }
@@ -128,15 +128,6 @@ function SuccessState({
         />
       </div>
 
-      <div
-        className="animate-fade-in-up mt-6"
-        style={{ animationDelay: "240ms" }}
-      >
-        <h4 className="mb-1 text-sm font-medium text-foreground">
-          Évolution du portefeuille
-        </h4>
-        <PortfolioChart data={result.portfolioHistory} isLoading={false} />
-      </div>
     </div>
   );
 }
@@ -250,9 +241,6 @@ function LoadingState() {
             <div className="mt-3 h-7 w-3/4 animate-pulse rounded bg-white/10" />
           </div>
         ))}
-      </div>
-      <div className="mt-6">
-        <PortfolioChart data={null} isLoading />
       </div>
     </div>
   );

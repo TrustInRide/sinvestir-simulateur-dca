@@ -19,10 +19,10 @@
   --color-secondary-hover: #f2c521;
 
   /* Surfaces */
-  --color-background: #141414; /* page (oklch 20.5%) */
-  --color-surface: #1e1e1e; /* elevated card */
-  --color-surface-hover: #242424;
-  --color-input: #0a0a0a;
+  --color-background: #090d14; /* page — dark navy-black like S'investir */
+  --color-surface: #0f1520; /* elevated card */
+  --color-surface-hover: #141e30;
+  --color-input: #060810;
 
   /* Text */
   --color-foreground: #ffffff;
