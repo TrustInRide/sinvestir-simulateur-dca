@@ -9,7 +9,7 @@ Simulateur d'investissement progressif (DCA) sur 7 000+ cryptomonnaies, conçu p
 ## Lancer en local
 
 ```bash
-git clone https://github.com/[REPO_GITHUB]
+git clone https://github.com/TrustInRide/sinvestir-simulateur-dca
 npm install
 npm run dev   # http://localhost:3000
 ```
