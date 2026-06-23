@@ -19,8 +19,8 @@
   --color-secondary-hover: #f2c521;
 
   /* Surfaces */
-  --color-background: #090d14; /* page — dark navy-black like S'investir */
-  --color-surface: #0f1520; /* elevated card */
+  --color-background: #0a0f1a; /* matches S'investir bg-[#0a0f1a] simulator sections */
+  --color-surface: #0f172a; /* matches S'investir --color-surface-soft: 15 23 42 */
   --color-surface-hover: #141e30;
   --color-input: #060810;
 
@@ -29,7 +29,7 @@
   --color-muted: #6b7280;
 
   /* Borders */
-  --color-border: #ffffff14; /* ~8% white */
+  --color-border: #ffffff0d; /* ~5% white — matches S'investir .card border rgba(255,255,255,0.05) */
   --color-border-strong: #ffffff20; /* ~12.5% white */
 
   /* Semantic */
