@@ -104,16 +104,39 @@ export default async function Home({
         </main>
 
         {/* Footer */}
-        <footer className="border-t border-border px-6 py-6">
-          <div className="mx-auto flex max-w-5xl flex-col items-center gap-2 text-center text-xs text-muted">
-            <p>
+        <footer className="border-t border-border px-6 py-8">
+          <div className="mx-auto flex max-w-4xl flex-col items-center gap-4 text-center">
+            <p className="text-[11px] leading-relaxed text-muted/70">
+              Les simulateurs proposés sont mis à disposition gratuitement, à des fins
+              exclusivement pédagogiques et informatives. Ils ont pour but d&rsquo;aider
+              les utilisateurs à mieux comprendre certaines notions ou à estimer des
+              situations selon les informations saisies. Ils ne constituent en aucun cas un
+              conseil en investissement, en fiscalité ou une recommandation personnalisée.
+              Investir comporte des risques, y compris de perte en capital. Les
+              performances passées ne préjugent en rien des performances futures. Les
+              résultats obtenus ne doivent pas être interprétés comme des recommandations
+              personnalisées ou des garanties de performance. Ils sont purement indicatifs
+              et peuvent varier en fonction des données saisies. Chaque utilisateur demeure
+              seul responsable de l&rsquo;usage qu&rsquo;il fait des résultats obtenus par
+              le biais des simulateurs. L&rsquo;utilisation de ces outils ne saurait engager
+              la responsabilité de l&rsquo;éditeur ou de son représentant légal, aux
+              décisions prises sur leur base.
+            </p>
+            <p className="text-xs text-muted">
               Copyright © {year} | CGVU | Mentions légales | Politique de
               confidentialité | Notice simulateur | Création{" "}
-              <span className="text-foreground/70">PULSION STUDIO</span>
+              <a
+                href="https://trustinride.fr"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-medium text-primary transition-colors hover:text-foreground"
+              >
+                TrustInRide
+              </a>
             </p>
-            <p className="text-muted/70">
-              Données de marché : Coinbase &amp; CoinGecko · Outil pédagogique,
-              sans conseil financier
+            <p className="text-xs text-muted/70">
+              Données de marché : Coinbase &amp; CoinGecko · Outil pédagogique, sans
+              conseil financier
             </p>
           </div>
         </footer>

@@ -134,6 +134,43 @@ export function Simulator({ defaultCoin, embedded = false }: SimulatorProps) {
           />
         </div>
       )}
+
+      {/* Graph disclaimer — shown alongside the results, like the original sim */}
+      {status === "success" && (
+        <div
+          className="animate-fade-in-up mt-6"
+          style={{ animationDelay: "340ms" }}
+        >
+          <GraphDisclaimer />
+        </div>
+      )}
+    </div>
+  );
+}
+
+function GraphDisclaimer() {
+  return (
+    <div className="flex items-start gap-3 rounded-card border border-border bg-surface/40 px-5 py-4">
+      <svg
+        className="mt-0.5 size-4 shrink-0 text-muted"
+        viewBox="0 0 16 16"
+        fill="none"
+        aria-hidden="true"
+      >
+        <circle cx="8" cy="8" r="6.5" stroke="currentColor" strokeWidth="1.3" />
+        <path d="M8 7v4M8 5.5h.01" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+      </svg>
+      <p className="text-xs leading-relaxed text-muted">
+        L&rsquo;illustration graphique et les résultats présentés ne constituent pas un
+        indicateur fiable quant aux performances futures de vos investissements. Ils ont
+        seulement pour but d&rsquo;illustrer les mécanismes de votre investissement sur la
+        durée de placement. L&rsquo;évolution de la valeur de votre investissement pourra
+        s&rsquo;écarter de ce qui est affiché, à la hausse comme à la baisse. Les gains et
+        les pertes peuvent dépasser les montants affichés, respectivement, dans les
+        scénarios les plus favorables et les plus défavorables. En poursuivant votre
+        navigation, vous reconnaissez avoir pris connaissance de cet avertissement, et
+        l&rsquo;avoir compris.
+      </p>
     </div>
   );
 }
