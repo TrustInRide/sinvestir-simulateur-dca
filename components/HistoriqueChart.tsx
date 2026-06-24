@@ -76,7 +76,7 @@ export function HistoriqueChart({ data, isLoading, unitSymbol }: HistoriqueChart
     <div className="w-full">
       <ChartLegend sym={sym} />
       <ResponsiveContainer width="100%" height={300}>
-        <ComposedChart data={chartData} margin={{ top: 8, right: 56, bottom: 0, left: 0 }}>
+        <ComposedChart data={chartData} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
           <defs>
             <linearGradient id="hist-valeur" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor={VALEUR} stopOpacity={0.28} />
@@ -99,12 +99,12 @@ export function HistoriqueChart({ data, isLoading, unitSymbol }: HistoriqueChart
             tick={{ fill: AXIS, fontSize: 11 }}
           />
 
-          {/* Left Y — euros (value & invested) */}
+          {/* Left Y — accumulated units (Acquis) — matches the original sim */}
           <YAxis
-            yAxisId="eur"
+            yAxisId="units"
             orientation="left"
-            tickFormatter={formatEURCompact}
-            width={60}
+            tickFormatter={(v: number) => formatUnits(v)}
+            width={56}
             tickLine={false}
             axisLine={false}
             tickMargin={6}
@@ -112,12 +112,12 @@ export function HistoriqueChart({ data, isLoading, unitSymbol }: HistoriqueChart
             tick={{ fill: AXIS, fontSize: 11 }}
           />
 
-          {/* Right Y — accumulated units */}
+          {/* Right Y — euros (Valeur & Investi) */}
           <YAxis
-            yAxisId="units"
+            yAxisId="eur"
             orientation="right"
-            tickFormatter={(v: number) => formatUnits(v)}
-            width={56}
+            tickFormatter={formatEURCompact}
+            width={60}
             tickLine={false}
             axisLine={false}
             tickMargin={6}

@@ -70,7 +70,11 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
         >
           {options
             ? options.map((opt) => (
-                <option key={opt.value} value={opt.value}>
+                <option
+                  key={opt.value}
+                  value={opt.value}
+                  style={{ backgroundColor: "#0f172a", color: "#ffffff" }}
+                >
                   {opt.label}
                 </option>
               ))

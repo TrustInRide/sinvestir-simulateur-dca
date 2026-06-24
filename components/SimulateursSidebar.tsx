@@ -42,7 +42,7 @@ export function SimulateursSidebar() {
           aria-label={collapsed ? "Déplier le menu" : "Replier le menu"}
           aria-expanded={!collapsed}
           className={cn(
-            "absolute -right-3 top-8 z-10 flex size-7 items-center justify-center rounded-full",
+            "absolute -right-3 top-1/2 z-10 flex size-7 -translate-y-1/2 items-center justify-center rounded-full",
             "border border-border-strong bg-surface text-muted shadow-[0_4px_12px_-2px_rgba(0,0,0,0.6)]",
             "transition-colors hover:border-primary hover:text-foreground",
             "outline-none focus-visible:ring-2 focus-visible:ring-primary/40",
