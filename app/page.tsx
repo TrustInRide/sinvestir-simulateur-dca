@@ -105,7 +105,7 @@ export default async function Home({
 
         {/* Footer */}
         <footer className="border-t border-border px-6 py-8">
-          <div className="mx-auto flex max-w-4xl flex-col items-center gap-4 text-center">
+          <div className="mx-auto flex max-w-[1500px] flex-col items-center gap-4 text-center">
             <p className="text-[11px] leading-relaxed text-muted/70">
               Les simulateurs proposés sont mis à disposition gratuitement, à des fins
               exclusivement pédagogiques et informatives. Ils ont pour but d&rsquo;aider
