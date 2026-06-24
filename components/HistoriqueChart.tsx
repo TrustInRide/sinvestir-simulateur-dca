@@ -145,7 +145,6 @@ export function HistoriqueChart({ data, isLoading, unitSymbol }: HistoriqueChart
             name="Investi"
             stroke={INVESTI}
             strokeWidth={2}
-            strokeDasharray="4 4"
             dot={false}
             activeDot={false}
             animationDuration={650}
