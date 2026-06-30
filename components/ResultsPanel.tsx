@@ -262,7 +262,7 @@ function IdleState() {
   return (
     <div className="flex flex-1 flex-col gap-4">
       <Card className="p-5">
-        <div className="text-[0.8rem] font-medium text-label">Valeur finale</div>
+        <div className="text-[0.8rem] font-medium text-label">Capital final</div>
         <div className="mt-2 h-9 w-2/3 rounded bg-white/[0.06]" />
         <div className="mt-5 h-2.5 w-full rounded-full bg-white/[0.05]" />
       </Card>

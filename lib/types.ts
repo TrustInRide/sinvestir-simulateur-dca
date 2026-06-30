@@ -42,6 +42,24 @@ export interface PortfolioPoint {
   units: number;
 }
 
+/** A single executed purchase (one row of the "Calendrier" table). */
+export interface ContributionEvent {
+  /** Day of the purchase. */
+  date: Date;
+  /** Unit price paid that day. */
+  price: number;
+  /** Amount invested that day (the recurring amount). */
+  amount: number;
+  /** Units bought that day: `amount / price`. */
+  units: number;
+  /** Cumulative amount invested up to and including this purchase. */
+  cumulativeInvested: number;
+  /** Cumulative units held up to and including this purchase. */
+  cumulativeUnits: number;
+  /** Portfolio market value right after this purchase. */
+  portfolioValue: number;
+}
+
 /** Outcome of a DCA simulation. */
 export interface DCAResult {
   totalInvested: number;
@@ -54,4 +72,6 @@ export interface DCAResult {
   /** Average acquisition price: `totalInvested / totalUnits`. */
   averagePrice: number;
   portfolioHistory: PortfolioPoint[];
+  /** Per-purchase breakdown powering the "Calendrier" table. */
+  schedule: ContributionEvent[];
 }

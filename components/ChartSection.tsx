@@ -4,7 +4,8 @@ import { useState } from "react";
 import type { ReactNode } from "react";
 import { HistoriqueChart } from "@/components/HistoriqueChart";
 import { GainsPertesChart } from "@/components/GainsPertesChart";
-import type { DCAResult } from "@/lib/types";
+import type { ContributionEvent, DCAResult } from "@/lib/types";
+import { formatEUR, formatUnits } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 type Tab = "graphiques" | "calendrier";
@@ -59,11 +60,115 @@ export function ChartSection({ result, isLoading, symbol }: ChartSectionProps) {
       )}
 
       {tab === "calendrier" && (
-        <div className="mt-6 flex min-h-[200px] items-center justify-center rounded-card border border-dashed border-border-strong bg-white/[0.02] text-sm text-muted">
-          Vue Calendrier — fonctionnalité à venir
+        <div className="mt-6">
+          <ContributionsTable schedule={result?.schedule ?? null} symbol={symbol} />
         </div>
       )}
     </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Calendrier — per-purchase breakdown table                         */
+/* ------------------------------------------------------------------ */
+
+const ROW_CAP = 366;
+
+const calDateFmt = new Intl.DateTimeFormat("fr-FR", {
+  day: "2-digit",
+  month: "short",
+  year: "numeric",
+});
+
+function ContributionsTable({
+  schedule,
+  symbol,
+}: {
+  schedule: ContributionEvent[] | null;
+  symbol?: string;
+}) {
+  if (!schedule || schedule.length === 0) {
+    return (
+      <div className="flex min-h-[180px] items-center justify-center rounded-card border border-dashed border-border-strong bg-white/[0.02] px-6 text-center text-sm text-muted">
+        Lancez une simulation pour détailler chaque versement, jour par jour.
+      </div>
+    );
+  }
+
+  const sym = (symbol ?? "").toUpperCase();
+  const truncated = schedule.length > ROW_CAP;
+  const rows = truncated ? schedule.slice(-ROW_CAP) : schedule;
+
+  return (
+    <div>
+      <p className="mb-3 text-xs text-muted">
+        {schedule.length.toLocaleString("fr-FR")} versement
+        {schedule.length > 1 ? "s" : ""} sur la période
+        {truncated && ` · affichage des ${ROW_CAP} plus récents`}
+      </p>
+
+      <div className="max-h-[480px] overflow-auto rounded-card border border-border-strong">
+        <table className="w-full min-w-[680px] border-collapse text-sm">
+          <thead className="sticky top-0 z-10 bg-surface text-xs font-medium text-muted">
+            <tr>
+              <Th className="text-left">Date</Th>
+              <Th>Prix unitaire</Th>
+              <Th>Investi</Th>
+              <Th>Unités{sym ? ` (${sym})` : ""}</Th>
+              <Th>Cumul investi</Th>
+              <Th>Valeur</Th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((e, i) => (
+              <tr
+                key={`${e.date.getTime()}-${i}`}
+                className="border-t border-border transition-colors hover:bg-white/[0.03]"
+              >
+                <Td className="whitespace-nowrap text-left text-foreground">
+                  {calDateFmt.format(e.date)}
+                </Td>
+                <Td>{formatEUR(e.price)}</Td>
+                <Td>{formatEUR(e.amount)}</Td>
+                <Td>{formatUnits(e.units)}</Td>
+                <Td>{formatEUR(e.cumulativeInvested)}</Td>
+                <Td className="font-medium text-foreground">
+                  {formatEUR(e.portfolioValue)}
+                </Td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+function Th({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <th className={cn("px-4 py-2.5 text-right font-medium", className)}>
+      {children}
+    </th>
+  );
+}
+
+function Td({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <td className={cn("px-4 py-2 text-right tabular-nums text-muted", className)}>
+      {children}
+    </td>
   );
 }
 

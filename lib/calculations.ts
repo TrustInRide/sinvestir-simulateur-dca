@@ -3,6 +3,7 @@
 /* ------------------------------------------------------------------ */
 
 import type {
+  ContributionEvent,
   DCAParams,
   DCAResult,
   Frequency,
@@ -126,13 +127,24 @@ export function calculateDCA(
   let units = 0;
   let invested = 0;
   let contributions = 0;
+  const schedule: ContributionEvent[] = [];
   const portfolioHistory: PortfolioPoint[] = buckets.map((bucket, i) => {
     // Buy first (at this day's price), then snapshot the portfolio so the
     // value reflects the freshly purchased units.
     if (investDays.has(i) && bucket.price > 0) {
-      units += amount / bucket.price;
+      const bought = amount / bucket.price;
+      units += bought;
       invested += amount;
       contributions += 1;
+      schedule.push({
+        date: bucket.date,
+        price: bucket.price,
+        amount,
+        units: bought,
+        cumulativeInvested: invested,
+        cumulativeUnits: units,
+        portfolioValue: units * bucket.price,
+      });
     }
     return {
       date: bucket.date,
@@ -157,5 +169,6 @@ export function calculateDCA(
     contributions,
     averagePrice,
     portfolioHistory,
+    schedule,
   };
 }

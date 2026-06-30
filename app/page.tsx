@@ -3,23 +3,28 @@ import { SimulateursSidebar } from "@/components/SimulateursSidebar";
 import { FormationCard } from "@/components/FormationCard";
 import { SInvestirLogo } from "@/components/SInvestirLogo";
 import { EmbedHeightReporter } from "@/components/EmbedHeightReporter";
+import { parseShareScenario } from "@/lib/share";
 
 export default async function Home({
   searchParams,
 }: {
-  searchParams: Promise<{ embedded?: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const params = await searchParams;
-  const isEmbedded = params.embedded === "true" || params.embedded === "1";
+  const embeddedParam = Array.isArray(params.embedded)
+    ? params.embedded[0]
+    : params.embedded;
+  const isEmbedded = embeddedParam === "true" || embeddedParam === "1";
+  const scenario = parseShareScenario(params);
 
   /* ---------------------------------------------------------------- */
   /* Embedded mode — minimal wrapper, no chrome                       */
   /* ---------------------------------------------------------------- */
   if (isEmbedded) {
     return (
-      <div className="mx-auto flex min-h-dvh w-full max-w-6xl flex-col px-5 py-4 sm:px-8">
+      <div className="mx-auto flex w-full max-w-6xl flex-col px-5 py-4 sm:px-8">
         <EmbedHeightReporter />
-        <Simulator embedded />
+        <Simulator embedded initialScenario={scenario} />
       </div>
     );
   }
@@ -96,7 +101,7 @@ export default async function Home({
             </div>
 
             {/* Simulator */}
-            <Simulator />
+            <Simulator initialScenario={scenario} />
 
             {/* Formation offerte */}
             <FormationCard />
@@ -144,9 +149,3 @@ export default async function Home({
     </div>
   );
 }
-
-/* ------------------------------------------------------------------ */
-/*  Header "NOUVEAUTÉ" callout                                          */
-/* ------------------------------------------------------------------ */
-
-/* (header right-side now a simple "Découvrir S'investir" link — see header above) */

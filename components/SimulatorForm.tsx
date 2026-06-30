@@ -31,6 +31,14 @@ interface SimulatorFormProps {
   onSubmit: (params: DCAParams) => void;
   isLoading: boolean;
   defaultCoin?: string;
+  /** Pre-selected coin (used when restoring a shared simulation). */
+  initialCoin?: CoinSearchResult;
+  initialAmount?: number;
+  initialFrequency?: Frequency;
+  /** `YYYY-MM-DD`. */
+  initialStart?: string;
+  /** `YYYY-MM-DD`. */
+  initialEnd?: string;
 }
 
 interface TouchedState {
@@ -40,7 +48,16 @@ interface TouchedState {
   end: boolean;
 }
 
-export function SimulatorForm({ onSubmit, isLoading, defaultCoin }: SimulatorFormProps) {
+export function SimulatorForm({
+  onSubmit,
+  isLoading,
+  defaultCoin,
+  initialCoin,
+  initialAmount,
+  initialFrequency,
+  initialStart,
+  initialEnd,
+}: SimulatorFormProps) {
   const todayISO = useMemo(() => toISODate(new Date()), []);
   const defaultStartISO = useMemo(() => {
     const d = new Date();
@@ -48,11 +65,15 @@ export function SimulatorForm({ onSubmit, isLoading, defaultCoin }: SimulatorFor
     return toISODate(d);
   }, []);
 
-  const [coin, setCoin] = useState<CoinSearchResult | null>(null);
-  const [amount, setAmount] = useState("50");
-  const [frequency, setFrequency] = useState<Frequency>("monthly");
-  const [start, setStart] = useState(defaultStartISO);
-  const [end, setEnd] = useState(todayISO);
+  const [coin, setCoin] = useState<CoinSearchResult | null>(initialCoin ?? null);
+  const [amount, setAmount] = useState(
+    initialAmount != null ? String(initialAmount) : "50",
+  );
+  const [frequency, setFrequency] = useState<Frequency>(
+    initialFrequency ?? "monthly",
+  );
+  const [start, setStart] = useState(initialStart ?? defaultStartISO);
+  const [end, setEnd] = useState(initialEnd ?? todayISO);
   const [touched, setTouched] = useState<TouchedState>({
     coin: false,
     amount: false,

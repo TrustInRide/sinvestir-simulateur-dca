@@ -1,12 +1,13 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { SimulatorForm } from "@/components/SimulatorForm";
 import { ResultsPanel, type ResultsStatus } from "@/components/ResultsPanel";
 import { ChartSection } from "@/components/ChartSection";
 import { Button } from "@/components/ui/Button";
 import { calculateDCA } from "@/lib/calculations";
 import { CoingeckoError, getHistoricalPrices } from "@/lib/coingecko";
+import { encodeShareParams, type ShareScenario } from "@/lib/share";
 import type { DCAParams, DCAResult } from "@/lib/types";
 
 const MIN_DATA_POINTS = 30;
@@ -20,15 +21,42 @@ function messageFor(error: unknown): string {
 interface SimulatorProps {
   defaultCoin?: string;
   embedded?: boolean;
+  /** A scenario decoded from the URL — restored (and auto-run) on first load. */
+  initialScenario?: ShareScenario | null;
 }
 
-export function Simulator({ defaultCoin, embedded = false }: SimulatorProps) {
+export function Simulator({
+  defaultCoin,
+  embedded = false,
+  initialScenario,
+}: SimulatorProps) {
   const [result, setResult] = useState<DCAResult | null>(null);
   const [params, setParams] = useState<DCAParams | null>(null);
   const [status, setStatus] = useState<ResultsStatus>("idle");
   const [error, setError] = useState<string>();
+  const [toast, setToast] = useState<string>();
 
   const lastParams = useRef<DCAParams | null>(null);
+  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const ranInitial = useRef(false);
+
+  const initialParams = useMemo<DCAParams | null>(() => {
+    if (!initialScenario) return null;
+    const startDate = new Date(`${initialScenario.startISO}T00:00:00.000Z`);
+    const endDate = new Date(`${initialScenario.endISO}T00:00:00.000Z`);
+    if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime())) {
+      return null;
+    }
+    return {
+      coinId: initialScenario.coinId,
+      coinName: initialScenario.coinName,
+      coinSymbol: initialScenario.coinSymbol,
+      amount: initialScenario.amount,
+      frequency: initialScenario.frequency,
+      startDate,
+      endDate,
+    };
+  }, [initialScenario]);
 
   const runSimulation = useCallback(async (next: DCAParams) => {
     lastParams.current = next;
@@ -63,6 +91,42 @@ export function Simulator({ defaultCoin, embedded = false }: SimulatorProps) {
     if (lastParams.current) void runSimulation(lastParams.current);
   }, [runSimulation]);
 
+  // Restore a shared simulation the first time the component mounts.
+  useEffect(() => {
+    if (initialParams && !ranInitial.current) {
+      ranInitial.current = true;
+      void runSimulation(initialParams);
+    }
+  }, [initialParams, runSimulation]);
+
+  const flashToast = useCallback((message: string) => {
+    setToast(message);
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+    toastTimer.current = setTimeout(() => setToast(undefined), 2800);
+  }, []);
+
+  useEffect(
+    () => () => {
+      if (toastTimer.current) clearTimeout(toastTimer.current);
+    },
+    [],
+  );
+
+  const handleShare = useCallback(async () => {
+    if (!params) return;
+    const url = `${window.location.origin}/?${encodeShareParams(params)}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      flashToast("Lien de simulation copié — il rouvre ce résultat à l’identique.");
+    } catch {
+      flashToast(`Copie impossible. Lien : ${url}`);
+    }
+  }, [params, flashToast]);
+
+  const handleSave = useCallback(() => {
+    flashToast("Connectez-vous à S’investir pour enregistrer vos simulations.");
+  }, [flashToast]);
+
   return (
     <div className="flex flex-1 flex-col">
       {/* Two-column: form (2/5) · metrics (3/5) — stacks below lg to breathe next to the rail */}
@@ -76,6 +140,20 @@ export function Simulator({ defaultCoin, embedded = false }: SimulatorProps) {
             onSubmit={(p) => void runSimulation(p)}
             isLoading={status === "loading"}
             defaultCoin={defaultCoin}
+            initialCoin={
+              initialScenario
+                ? {
+                    id: initialScenario.coinId,
+                    symbol: initialScenario.coinSymbol,
+                    name: initialScenario.coinName,
+                    thumb: "",
+                  }
+                : undefined
+            }
+            initialAmount={initialScenario?.amount}
+            initialFrequency={initialScenario?.frequency}
+            initialStart={initialScenario?.startISO}
+            initialEnd={initialScenario?.endISO}
           />
         </section>
 
@@ -97,27 +175,40 @@ export function Simulator({ defaultCoin, embedded = false }: SimulatorProps) {
       {/* Action buttons — shown once user has submitted at least once, hidden in embed */}
       {!embedded && (
         <div
-          className="animate-fade-in-up mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center"
+          className="animate-fade-in-up mt-6 flex flex-col items-center gap-3"
           style={{ animationDelay: "240ms" }}
         >
-          <Button
-            variant="primary"
-            size="lg"
-            disabled={status !== "success"}
-            className="sm:min-w-52"
-          >
-            <SaveActionIcon />
-            Enregistrer la simulation
-          </Button>
-          <Button
-            variant="light"
-            size="lg"
-            disabled={status !== "success"}
-            className="sm:min-w-52"
-          >
-            <ShareIcon />
-            Partager mes résultats
-          </Button>
+          <div className="flex w-full flex-col gap-3 sm:flex-row sm:justify-center">
+            <Button
+              variant="primary"
+              size="lg"
+              disabled={status !== "success"}
+              onClick={handleSave}
+              className="sm:min-w-52"
+            >
+              <SaveActionIcon />
+              Enregistrer la simulation
+            </Button>
+            <Button
+              variant="light"
+              size="lg"
+              disabled={status !== "success"}
+              onClick={() => void handleShare()}
+              className="sm:min-w-52"
+            >
+              <ShareIcon />
+              Partager mes résultats
+            </Button>
+          </div>
+          {toast && (
+            <p
+              role="status"
+              aria-live="polite"
+              className="animate-fade-in-up text-center text-xs text-muted"
+            >
+              {toast}
+            </p>
+          )}
         </div>
       )}
 
